@@ -25,7 +25,6 @@ preprocess = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-
 def refine_mask(mask):
     # Convert mask to uint8 format
     mask = (mask * 255).astype(np.uint8)
@@ -38,6 +37,20 @@ def refine_mask(mask):
 
     return mask
 
+def keep_largest_connected_component(mask):
+    num_labels, labels_im = cv2.connectedComponents(mask)
+    if num_labels > 2:  # More than one person (background counts as one label)
+        print(f"Found {num_labels - 1} people in the image. Keeping only the largest connected component.")
+        largest_component = 0
+        largest_size = 0
+        for label in range(1, num_labels):
+            size = np.sum(labels_im == label)
+            if size > largest_size:
+                largest_size = size
+                largest_component = label
+        mask = labels_im == largest_component
+    return mask.astype(np.uint8)
+
 def remove_background(image):
     image_pil = Image.fromarray(image)
     input_tensor = preprocess(image_pil).unsqueeze(0).to(device)
@@ -46,6 +59,9 @@ def remove_background(image):
     output_predictions = output.argmax(0).byte().cpu().numpy()
     mask = output_predictions == 15  # Class 15 is the person class
     mask = cv2.resize(mask.astype(np.uint8), (image_pil.width, image_pil.height))
+
+    # Keep only the largest connected component
+    mask = keep_largest_connected_component(mask)
 
     # Refine the mask
     refined_mask = refine_mask(mask)

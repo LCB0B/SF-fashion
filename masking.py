@@ -24,6 +24,7 @@ list_of_images = os.listdir('data/images_sample')
 embeddings_dict = {}
 for image_file in tqdm.tqdm(list_of_images):
     image_id = image_file.split('.')[0]
+    print(f"Processing image {image_id}")
     image_path = 'data/images_sample/' + image_file
     image = cv2.imread(image_path)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

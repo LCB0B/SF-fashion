@@ -37,7 +37,7 @@ color_list = [collection_color[c] for c in collection]
 
 # # Plot the projected embeddings
 plt.figure(figsize=(10, 7))
-a=plt.scatter(embeddings_2d[:, 0], embeddings_2d[:, 1], s=1, alpha=1,c=collection,cmap='tab20')
+a=plt.scatter(embeddings_2d[:, 0], embeddings_2d[:, 1], s=1, alpha=0.8,c=collection,cmap='tab20')
 plt.xlabel('Dimension 1')
 plt.ylabel('Dimension 2')
 #remove the axis
